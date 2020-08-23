@@ -2,7 +2,7 @@
   <div >
 
 
-        <select v-model="$store.state.choisi" class="liste"  >
+        <select v-model="$store.state.choisi" v-on:click="$store.state.seen2 = false" class="liste"  >
              <option value="">--Please choose a style--</option>
             <optgroup label="Electronic">
               <option v-for="musicElectro in musicElectros" v-bind:key="musicElectro.value" v-bind:value="musicElectro.value">
@@ -28,7 +28,6 @@ export default {
   name: 'selected',
   data(){
     return {
-  //   choisi: '',
      musicElectros: [
        { text: 'IDM', value: ["electronic","idm"] },
        { text: 'House', value: ["electronic","house"] },
@@ -50,9 +49,9 @@ export default {
 select{
 
   margin: 1vw;
-  border: 2px solid blue;
+  border: 2px solid var(--primary);
   border-radius: 100rem;
-  color: blue;
+  color: ;
   font-family: 'Montserrat', sans-serif;
   font-size: 2.5vw;
   outline: none;

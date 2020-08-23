@@ -1,9 +1,11 @@
 <template lang="html">
 
   <div class="container" v-on:keypress="goVynilEnter">
-    <h1> BirthVynil</h1>
+    <h1> BirthVinyl</h1>
     <div class="block">
     <label for="date" class="contourVynil">
+
+      <div v-if="seen" class="commentaire"> Rentre une année de naissance </div>
 
 
     <div class="centreVynil" >
@@ -11,24 +13,29 @@
       <div class="annee">
          Birth year :
       </div>
-    <input id="date" type="number" min="1900" max="2021" placeholder="e.g. 1992" v-model="requete">
+    <input id="date" type="number" min="1921" max="2021" placeholder="1992" value="1992" v-on:click="seen = false" v-model="requete">
     </div>
     </label>
     </div>
 
-    <div class="block">
 
+    <div class="block">
+        <div v-if="$store.state.seen2" class="commentaire commentaire2"> Choisis un style de musique </div>
     <selected>    </selected>
+
+
     <button class="search" v-on:click="goVynil"> search </button>
+
 
     </div>
 
+    <p class="no_vinyl" v-if="this.vynile == 0"> Aucun vinyle n'est disponible pour cette recherche... Veuillez renseigner un autre style de musique ou une autre année de naissance.</p>
 
-    <div class="mise_enpage">
+    <div class="mise_enpage" ref="renduVinyl">
 
           <a :href="urlDiscogs + vynil.uri" target="_blank" v-for="vynil in vynile" :key="vynil.title" class="rendu">
 
-                        <h2 > {{ vynil.title }} </h2>
+                        <h2> {{ vynil.title }} </h2>
                         <p class="year_rendu"> {{ vynil.year }}</p>
                         <img :src="vynil.cover_image" >
 
@@ -44,6 +51,7 @@
 
 <script>
 
+
 import axios from 'axios'
 import selected from './selected.vue'
 
@@ -51,6 +59,7 @@ import selected from './selected.vue'
 export default {
   data(){
     return {
+      seen: true,
       requete: '',
       vynile : undefined,
       urlImg : undefined,
@@ -65,20 +74,25 @@ export default {
     'selected' : selected
   },
   methods: {
-    goVynilEnter(e){
-        if(e.key == "Enter"){
-            this.goVynil()
-        }
+            goVynilEnter(e){
+                if(e.key == "Enter"){
+                    this.goVynil()
+                }
+              },
+            goVynil: function(){
+              axios
+                .get(`${this.url_recherche}genre=${this.$store.state.choisi[0]}&style=${this.$store.state.choisi[1]}&year=${this.requete}&format=album&type=master&key=${this.key}&secret=${this.secret}`)
+                .then(response => {
+                  this.vynile = response.data.results
+                  console.log(this.vynile)
+                })
+              //  this.requete = ''
+              },
+
       },
-    goVynil: function(){
-      axios
-        .get(`${this.url_recherche}genre=${this.$store.state.choisi[0]}&style=${this.$store.state.choisi[1]}&year=${this.requete}&format=album&type=master&key=${this.key}&secret=${this.secret}`)
-        .then(response => {
-          this.vynile = response.data.results
-        })
-        this.requete = ''
-      }
-    }
+      updated(){
+               this.$refs.renduVinyl.scrollIntoView({behavior: "smooth"})
+        }
   }
 </script>
 
@@ -93,8 +107,14 @@ export default {
 
 
 <style >
+
+html{
+  --primary: black;
+}
+
+
 .container{
-  color : blue;
+  color : var(--primay);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -102,6 +122,38 @@ export default {
 
 h1{
   font-size: 8vw;
+}
+
+.commentaire{
+  position: absolute;
+  left: 2vw;
+  top: 40vw;
+  font-size: 2vw;
+  color: white;
+  background-color: blue;
+  padding: 2vw;
+}
+
+.commentaire:before{
+  content: "";
+  position: absolute;
+  background-color: blue;
+  left: 95%;
+  width: 20vw;
+  height: 1vw;
+  bottom: -5vw;
+  transform: rotate(30deg);
+  z-index: -1;
+}
+
+.commentaire2{
+  top: 70vw;
+}
+
+.commentaire2:before{
+  width: 23vw;
+  transform: rotate(30deg);
+  left: 50%;
 }
 
 
@@ -150,6 +202,8 @@ h2{
   margin: 1vw;
   color: blue;
   text-align: center;
+  height: 5vh;
+  overflow: hidden;
 
 }
 
@@ -157,7 +211,6 @@ h2{
 
 .contourVynil{
   margin: 1vw;
-  border: 2px solid blue;
   border-radius: 100%;
 
   width: 60vw;
@@ -166,6 +219,9 @@ h2{
   display: flex;
   align-items: center;
   justify-content: center;
+  background-size: 60vw;
+  background-image: url("../assets/vinyl.jpg");
+  z-index: 0;
 }
 
 
@@ -173,8 +229,8 @@ h2{
   background-color: blue;
   border: 2px solid blue;
   border-radius: 100%;
-  width: 25vw;
-  height: 25vw;
+  width: 20vw;
+  height: 20vw;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -253,8 +309,8 @@ body{
   height: 10vw;
   border-radius: 100%;
   background-color: white;
-  border: 2px solid blue;
-  color: blue;
+  border: 2px solid var(--primary);
+  color: var(--primary);
   font-size: 2.5vw;
   text-align: center;
   cursor: pointer;
@@ -271,6 +327,13 @@ body{
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+}
+
+.no_vinyl{
+  font-size: 2.5vw;
+  padding-top: 2vw;
+  padding-left: 6vw;
+  padding-right: 6vw;
 }
 
 </style>
