@@ -86,10 +86,14 @@ export default {
                   this.vynile = response.data.results
                   console.log(this.vynile)
                 })
+                let grandVinyl = document.querySelector('.contourVynil')
+                grandVinyl.style.animationName = "tourne"
+                setTimeout(function (){grandVinyl.style.animationName = null}, 500)
               //  this.requete = ''
               },
 
       },
+
       updated(){
                this.$refs.renduVinyl.scrollIntoView({behavior: "smooth"})
         }
@@ -222,6 +226,9 @@ h2{
   background-size: 60vw;
   background-image: url("../assets/vinyl.jpg");
   z-index: 0;
+
+  animation: 0.5s ease-in ;
+
 }
 
 
@@ -236,8 +243,17 @@ h2{
   align-items: center;
   justify-content: center;
   cursor: pointer;
+
 }
 
+@keyframes tourne {
+  from {
+    transform: rotate(0deg);
+  }
+  to{
+    transform: rotate(1080deg);
+  }
+}
 
 .annee{
   font-size: 2.5vw;
@@ -259,7 +275,7 @@ input{
 
 
 }
-
+/*
 
 .centreVynil:hover{
   border: 4px solid blue;
@@ -268,7 +284,7 @@ input{
 .centreVynil:focus{
   border: 4px solid blue;
 }
-
+*/
 
 
 input:not(:focus):invalid{
